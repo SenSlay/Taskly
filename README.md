@@ -33,8 +33,8 @@ I already provided initial design for sprints
 
 ### 1. UI AND DISPLAY TASKS - (Name of Assignee)
 
-1. Follow the UI from our figma
-2. Display the tasks based on backlog data
+1. Follow the UI from our figma, just display one sample task so u can do the styling
+2. The other tasks should be based on what is in backlog
 ![alt text](/assets/image-5.png)
 
 ### 2. Logic - (Name of Assignee)
