@@ -13,7 +13,7 @@
 
 ## - BACKLOG PAGE: NEED 2 MEMBERS
 
-### 1. Sprints - (Name of Assignee)
+### 1. Sprints - (Arman)
 
 I already provided initial design for sprints
 
