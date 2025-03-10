@@ -19,7 +19,7 @@ I already provided initial design for sprints
 
 1. Create a Sprint modal just like below (improve styling) ![alt text](/assets/image-2.png)
 2. When "Create Sprint" button is clicked, open the Sprint modal
-3. When the input fields are filled and add sprint is clicked. Add something similar to the below. Instead of start sprint button, replace it with "Complete Sprint" Button, which when clicked, just removes the sprint from the screen![alt text](/assets/image-3.png)
+3. When the input fields are filled and add sprint is clicked. Render something similar to the below. Instead of start sprint button, replace it with "Complete Sprint" Button, which when clicked, just removes the sprint from the screen![alt text](/assets/image-3.png)
 
 
 ### 2. Tasks - (Name of Assignee)
