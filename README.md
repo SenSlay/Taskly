@@ -39,10 +39,10 @@ Then when adding a task, store it in an array so it can be accessed by other fun
 
 1. Follow the UI from our figma, just display one sample task so u can do the styling
 2. The other tasks should be based on what is in backlog
+3. Write the Logic for Kanban columns: Should be able to Add a Column and Rename a column
 ![alt text](/assets/image-5.png)
 
 ### 2. Logic - (Patrick)
 
-1. Write the Logic for Kanban columns: Should be able to Add a Column and Rename a column
 2. Write logic for Dragging a task around the columns
 3. Write logic for + create issue, can use the same modal and function from Backlog page if already made.
