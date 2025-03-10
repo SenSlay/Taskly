@@ -1,0 +1,42 @@
+.backlog-container {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  background-color: rgb(232, 229, 229);
+  padding: 15px;
+}
+
+.backlog-container > div:first-child {
+  display: flex;
+  align-items: center;
+}
+
+.backlog-container .create-sprint-button {
+  padding: 5px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-left: auto;
+}
+
+.backlog-container > div:first-child h2 {
+  font-size: 18px; 
+  margin-right: 10px;
+}
+
+.backlog-container > div:first-child p {
+  color: rgb(69, 69, 69);
+}
+
+.backlog-container .issue-container {
+  border: 1px solid rgb(120, 120, 120);
+  padding: 5px;
+
+  display: flex;
+  flex-direction: column;
+}
+
+.create-issue-button {
+  padding: 5px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+}
