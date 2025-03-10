@@ -28,6 +28,7 @@ I already provided initial design for sprints
 2. Then when "Add Task" in the modal is clicked, add a task to Backlog or Sprint depending where the "Create Task" was clicked.
 ![alt text](/assets/image-4.png)
 3. Update the number of tasks within the container where the task was added.
+4. Keep a way of tracking Tasks, via array or something. This will be accessed for the board page
 
 ## BOARD PAGE: NEED 2 MEMBERS
 
