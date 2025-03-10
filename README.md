@@ -31,7 +31,7 @@ I already provided initial design for sprints
 
 ## BOARD PAGE: NEED 2 MEMBERS
 
-### 1. UI AND DISPLAY TASKS - (Name of Assignee)
+### 1. UI AND DISPLAY TASKS - (ALEXIS ARVIE)
 
 1. Follow the UI from our figma, just display one sample task so u can do the styling
 2. The other tasks should be based on what is in backlog
