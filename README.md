@@ -22,7 +22,7 @@ I already provided initial design for sprints
 3. When the input fields are filled and add sprint is clicked. Render something similar to the below. Instead of start sprint button, replace it with "Complete Sprint" Button, which when clicked, just removes the sprint from the screen![alt text](/assets/image-3.png)
 
 
-### 2. Tasks - (Name of Assignee)
+### 2. Tasks - (Ryonan)
 
 1. Create a Task modal similar to sprint modal when "+ Create Task" button is clicked. In the modal include fields: Task Name, Status for whether the task is To Do, In progress or Completed, and an input to assign the task to someone.
 2. Then when "Add Task" in the modal is clicked, add a task to Backlog or Sprint depending where the "Create Task" was clicked.
@@ -38,7 +38,7 @@ I already provided initial design for sprints
 2. The other tasks should be based on what is in backlog
 ![alt text](/assets/image-5.png)
 
-### 2. Logic - (Name of Assignee)
+### 2. Logic - (Patrick)
 
 1. Write the Logic for Kanban columns: Should be able to Add a Column and Rename a column
 2. Write logic for Dragging a task around the columns
