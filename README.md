@@ -2,8 +2,8 @@
 
 ## NOTES:
 
+- We're only coding the BACKLOG and BOARD page
 - To RUN: Get all the files locally and Run LIVE SERVER on vscode 
-
 - WHEN ADDING UR WORK TO THE FILE, LET GROUPMATES KNOW AND DONT REMOVE ANYTHING ELSE THEY MIGHT BE WORKING ON
 - Use dedicated CSS and JS files for the pages.
 - Add .backlog-content or .board-content when styling class names to avoid conflicts. E.g. .backlog-content .modal. Something liek that.
