@@ -24,7 +24,7 @@ I already provided initial design for sprints
 
 ### 2. Tasks - (Ryonan)
 
-When doing this, ask chatgpt to create a class for Task with the properties: Task Name, Status (Set default to To Do), Assignee, along with all it's get/set methods.
+When doing this, ask chatgpt to create a class for Task with the properties: ID, Task Name, Status (Set default to To Do), Assignee, along with all it's get/set methods.
 Then when adding a task, store it in an array so it can be accessed by other functions and code.
 
 1. Create a Task modal similar to sprint modal when "+ Create Task" button is clicked. In the modal include fields: Task Name, Status for whether the task is To Do, In progress or Completed, and an input to assign the task to someone.
