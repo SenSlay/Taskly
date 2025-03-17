@@ -6,16 +6,6 @@
   padding: 15px;
 }
 
-/* testing this */
-.backlog-content .task-item {
-  background-color: white;
-  padding: 10px;
-  border-radius: 4px;
-  border: 1px solid #ddd;
-  display: flex;
-  justify-content: space-between;
-}
-
 .backlog-container > div:first-child {
   display: flex;
   align-items: center;
@@ -37,13 +27,14 @@
   color: rgb(69, 69, 69);
 }
 
-/* updated css styles */
 .backlog-container .issue-container {
   border: 1px solid rgb(120, 120, 120);
-  padding: 15px;
+  padding: 5px;
+  justify-content: space-between;
+
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 15px;
 }
 
 .create-issue-button {
@@ -52,7 +43,134 @@
   cursor: pointer;
 }
 
-/* updated css styles by Ryonan */
+.sprint-list-container {
+  margin-bottom: 50px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/*Sprint*/
+.sprint-card {
+  background: #d4d4d4;
+  padding: 15px;
+  border-radius: 5px;
+  margin-bottom: 15px;
+}
+
+.sprint-header {
+    display: flex;
+    align-items: center;
+}
+
+.sprint-header h2 {
+  font-size: 36px;
+}
+
+.sprint-header > div {
+  display: flex; 
+  gap: 20px;
+}
+
+.sprint-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.sprint-container .create-btn {
+  padding: 5px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-left: auto;
+}
+
+.sprint-container .complete-btn {
+  padding: 5px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-left: auto;
+}
+
+/*  sprint Modal */
+#sprintModal .modal-button {
+    padding: 8px 12px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+#sprintModal .create-btn {
+    background: #b3b5b8;
+    color: white;
+}
+#sprintModal .complete-btn {
+  padding: 5px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-left: auto;
+    background: rgb(239, 239, 239);
+    color: rgba(22, 21, 21, 0.908);
+    }
+
+#sprintModal.modal {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  padding: 20px;
+  width: 350px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+}
+
+#sprintModal.modal input, #sprintModal.modal textarea {
+  width: 90%;
+  padding: 8px;
+  margin: 10px 0;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+#sprintModal .modal-buttons {
+  display: flex;
+  justify-content: space-between;
+}
+
+#sprintModal .cancel-btn {
+  background: #bbb;
+}
+
+/* Task Items */
+.backlog-content .task-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  background-color: white;
+  border: 1px solid #000;
+  border-radius: 4px;
+}
+
+.backlog-content .task-details {
+  flex-grow: 1;
+  margin-right: 15px;
+}
+
+.backlog-content .delete-task {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 5px;
+  color: #000;
+}
+
+.backlog-content .delete-task:hover {
+  color: #ff4444;
+}
+
 /* Task Modal Styles */
 .backlog-content .modal-overlay {
   display: none;
@@ -67,6 +185,7 @@
 
 .backlog-content .modal {
   background-color: white;
+  color: black;
   padding: 20px;
   border-radius: 8px;
   width: 400px;
@@ -74,6 +193,7 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+  border: 1px solid black;
 }
 
 .backlog-content .form-group {
@@ -83,14 +203,17 @@
 .backlog-content .form-group label {
   display: block;
   margin-bottom: 5px;
+  color: black;
 }
 
 .backlog-content .form-group input,
 .backlog-content .form-group select {
   width: 100%;
   padding: 8px;
-  border: 1px solid #ddd;
+  border: 1px solid black;
   border-radius: 4px;
+  background-color: white;
+  color: black;
 }
 
 .backlog-content .modal-buttons {
@@ -107,13 +230,50 @@
 }
 
 .backlog-content .modal-buttons button[type="submit"] {
-  background-color: #4CAF50;
+  background-color: black;
   color: white;
   border: none;
 }
 
 .backlog-content .cancel-btn {
-  background-color: #f44336;
-  color: white;
-  border: none;
+  background-color: white;
+  color: black;
+  border: 1px solid black;
+}
+
+/* Add these new styles */
+.backlog-content .task-details {
+  flex-grow: 1;
+  margin-right: 15px;
+  display: grid;
+  gap: 8px;
+}
+
+.backlog-content .task-details span:first-child {
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.backlog-content .task-details span:not(:first-child) {
+  font-size: 14px;
+  color: #666;
+  display: flex;
+  gap: 15px;
+}
+
+.backlog-content .task-details span:not(:first-child)::before {
+  content: "•";
+  margin-right: 8px;
+  color: #999;
+}
+
+.backlog-content .task-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  background-color: white;
+  border: 1px solid #000;
+  border-radius: 4px;
+  gap: 15px;
 }
