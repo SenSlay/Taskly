@@ -91,19 +91,32 @@ function taskTemplate(task, sprintIndex) {
                 <span>Status: ${task.status}</span>
                 <span>Assigned: ${task.assigned || "Unassigned"}</span>
             </div>
-            <button class="edit-task" data-task-id="${task.id}" data-sprint-index="${sprintIndex}">Edit</button>
-            <button class="delete-task" data-task-id="${task.id}">Delete</button>
+            <button class="edit-task" data-task-id="${task.id}" data-sprint-index="${sprintIndex !== null ? sprintIndex : 'backlog'}">Edit</button>
+            <button class="delete-task" data-task-id="${task.id}" data-sprint-index="${sprintIndex !== null ? sprintIndex : 'backlog'}">Delete</button>
         </div>
     `;
 }
 
-function openEditTaskModal(taskId, sprintIndex) {
-  const task = sprints[sprintIndex].tasks.find(t => t.id == taskId);
-  console.log('test')
+function openEditTaskModal(taskId, sprintIndex = "backlog") {
+  let task;
+  console.log(taskId)
+  console.log(backlogTasks)
+  console.log(sprintIndex)
+
+  if (sprintIndex == "backlog") {
+      // Edit from Backlog
+      task = backlogTasks.find(t => t.id == taskId);
+    } else {
+      // Edit from Sprint
+      task = sprints[sprintIndex].tasks.find(t => t.id == taskId);
+  }
+
   if (!task) return;
 
-  document.querySelector(".task-modal-title").textContent = "Edit Modal"
-  document.querySelector(".task-modal-add-btn").textContent = "Save Edit"
+  console.log('Opening Edit Modal for Task:', task);
+
+  document.querySelector(".task-modal-title").textContent = "Edit Task";
+  document.querySelector(".task-modal-add-btn").textContent = "Save Edit";
 
   document.getElementById("taskName").value = task.name;
   document.getElementById("taskStatus").value = task.status;
@@ -118,17 +131,30 @@ function openEditTaskModal(taskId, sprintIndex) {
   document.getElementById("taskModal").style.display = "block";
 }
 
-function saveTaskEdits(taskId, sprintIndex) {
-  const task = sprints[sprintIndex].tasks.find(t => t.id == taskId);
+function saveTaskEdits(taskId, sprintIndex = "backlog") {
+  let task;
+
+  if (sprintIndex === "backlog") {
+      // Update in Backlog
+      task = backlogTasks.find(t => t.id == taskId);
+      
+  } else {
+      // Update in Sprint
+      task = sprints[sprintIndex].tasks.find(t => t.id == taskId);
+  }
+
   if (!task) return;
 
+  // Update task properties
   task.name = document.getElementById("taskName").value;
   task.status = document.getElementById("taskStatus").value;
   task.assigned = document.getElementById("taskAssigned").value;
 
+  // Save and re-render
   saveData();
   renderSprints();
-
+  renderBacklogTasks()
+  // Close modal
   document.getElementById("taskModal").style.display = "none";
   document.getElementById("taskForm").reset();
 }
@@ -269,7 +295,7 @@ function renderBacklogTasks() {
 
   issueContainer.innerHTML = backlogTasks.length === 0 
       ? "<p>Your backlog is empty.</p>" 
-      : backlogTasks.map(taskTemplate).join("");
+      : backlogTasks.map(task => taskTemplate(task, null)).join("");
 
   addBacklogTaskEventListeners();
 }
