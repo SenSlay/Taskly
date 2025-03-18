@@ -669,14 +669,33 @@ if (board) {
     }
 
     function deleteColumn(column) {
-        const columnName = column.querySelector(".column-header span").textContent;
-        const index = kanbanColumns.indexOf(columnName);
-        if (index !== -1) {
-            kanbanColumns.splice(index, 1);
-            saveColumns();
-            renderBoard();
-        }
-    }
+      const columnName = column.querySelector(".column-header span").textContent;
+      const index = kanbanColumns.indexOf(columnName);
+  
+      if (index !== -1) {
+          // Update tasks that were in this column
+          backlogTasks.forEach(task => {
+              if (task.status === columnName) {
+                  task.status = ""; // Remove status
+              }
+          });
+  
+          // Also update tasks in sprints
+          sprints.forEach(sprint => {
+              sprint.tasks.forEach(task => {
+                  if (task.status === columnName) {
+                      task.status = ""; // Remove status
+                  }
+              });
+          });
+  
+          // Remove the column
+          kanbanColumns.splice(index, 1);
+          saveColumns();
+          saveData(); // Save updated tasks
+          renderBoard();
+      }
+  }
 
     function closeAllMenus() {
         document.querySelectorAll(".menu-dropdown").forEach((menu) => (menu.style.display = "none"));
