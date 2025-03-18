@@ -99,6 +99,7 @@ function taskTemplate(task, sprintIndex) {
 
 function openEditTaskModal(taskId, sprintIndex) {
   const task = sprints[sprintIndex].tasks.find(t => t.id == taskId);
+  console.log('test')
   if (!task) return;
 
   document.querySelector(".task-modal-title").textContent = "Edit Modal"
@@ -382,7 +383,7 @@ if (board) {
   
       // Create a text display for both task name and assignee
       const taskText = document.createElement("span");
-      taskText.textContent = `${task.name} (Assigned to: ${task.assignee})`;
+      taskText.textContent = `${task.name} (Assigned to: ${task.assigned})`;
   
       // Create a delete button for the task
       const deleteBtn = document.createElement("button");
@@ -470,14 +471,20 @@ if (board) {
         taskContainer.classList.add("task-container");
 
         taskContainer.addEventListener("dragover", function (e) {
-            e.preventDefault();
-        });
-
-        taskContainer.addEventListener("drop", function (e) {
-            e.preventDefault();
-            const draggedTask = document.querySelector(".dragging");
-            taskContainer.appendChild(draggedTask);
-        });
+          e.preventDefault(); // Allow dropping
+      });
+      
+      taskContainer.addEventListener("drop", function (e) {
+          e.preventDefault();
+          const draggedTask = document.querySelector(".dragging");
+          if (!draggedTask) return;
+      
+          const taskId = Number(draggedTask.dataset.taskId); // Get task ID
+          const newStatus = titleSpan.textContent.trim(); // Get new column name
+      
+          updateTaskStatus(taskId, newStatus); // Update status in storage
+          taskContainer.appendChild(draggedTask); // Move to new column
+      });
 
         columnHeader.appendChild(titleSpan);
         newColumn.appendChild(columnHeader);
@@ -495,6 +502,31 @@ if (board) {
             openModal(taskContainer, name);
         });
     }
+
+    function updateTaskStatus(taskId, newStatus) {
+      taskId = Number(taskId); // Ensure it's a number
+  
+      // Check backlog first
+      let task = backlogTasks.find(task => task.id === taskId);
+      if (task) {
+          task.status = newStatus;
+      } else {
+          // Check in sprints
+          sprints.forEach(sprint => {
+              sprint.tasks.forEach(t => {
+                  if (t.id === taskId) {
+                      t.status = newStatus;
+                  }
+              });
+          });
+      }
+  
+      // Save updated data
+      localStorage.setItem("backlogTasks", JSON.stringify(backlogTasks));
+      localStorage.setItem("sprints", JSON.stringify(sprints));
+  
+      console.log(`Task ${taskId} moved to ${newStatus}`); // Debugging
+  }
 
     function openModal(taskContainer, columnStatus) {
         modal.style.display = "block";
