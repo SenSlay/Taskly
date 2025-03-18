@@ -3,7 +3,12 @@ console.log("For backlog page");
 // Load Data from Local Storage
 let sprints = JSON.parse(localStorage.getItem("sprints")) || [];
 let backlogTasks = JSON.parse(localStorage.getItem("backlogTasks")) || [];
-let kanbanColumns = ["TO DO", "IN PROGRESS", "COMPLETED"];
+
+// Default columns
+const DEFAULT_COLUMNS = ["TO DO", "IN PROGRESS", "COMPLETED"];
+
+// Load Kanban columns from localStorage or set defaults
+let kanbanColumns = JSON.parse(localStorage.getItem("kanbanColumns")) || DEFAULT_COLUMNS;
 
 console.log("Loaded sprints from localStorage:", sprints);
 
@@ -321,210 +326,312 @@ document.querySelector(".create-backlog-task-button")?.addEventListener("click",
 document.addEventListener("DOMContentLoaded", renderBacklogTasks);
 
 
-
-
+// Save to localStorage if no stored columns exist
+if (!localStorage.getItem("kanbanColumns")) {
+  localStorage.setItem("kanbanColumns", JSON.stringify(DEFAULT_COLUMNS));
+}
 
 
 // BOARD.JS
 const board = document.querySelector(".board");
 if (board) {
-  const addColumnBtn = document.createElement("button");
-  addColumnBtn.id = "addColumnBtn";
-  addColumnBtn.classList.add("add-column");
-  addColumnBtn.textContent = "+";
+    const addColumnBtn = document.createElement("button");
+    addColumnBtn.id = "addColumnBtn";
+    addColumnBtn.classList.add("add-column");
+    addColumnBtn.textContent = "+";
 
-  // Create modal elements
-  const modal = document.createElement("div");
-  modal.classList.add("modal");
-  modal.style.display = "none";
+    function getAllTasks() {
+        return [
+            ...sprints.flatMap(sprint => sprint.tasks),
+            ...backlogTasks
+        ];
+    }
 
-  const modalContent = document.createElement("div");
-  modalContent.classList.add("modal-content");
+    function removeTask(taskId) {
+      taskId = Number(taskId); // Ensure it's a number
+  
+      // Remove from backlog
+      backlogTasks = backlogTasks.filter(task => task.id !== taskId);
+  
+      // Remove from sprints
+      sprints.forEach(sprint => {
+          sprint.tasks = sprint.tasks.filter(task => task.id !== taskId);
+      });
+  
+      // Update localStorage
+      localStorage.setItem("backlogTasks", JSON.stringify(backlogTasks));
+      localStorage.setItem("sprints", JSON.stringify(sprints));
+  
+      console.log("Deleted Task ID:", taskId); // Debugging
+    }
 
-  const taskNameInput = document.createElement("input");
-  taskNameInput.placeholder = "Task Name";
-  const assigneeInput = document.createElement("input");
-  assigneeInput.placeholder = "Assignee Name";
-
-  const submitBtn = document.createElement("button");
-  submitBtn.textContent = "Create Task";
-  submitBtn.addEventListener("click", handleTaskSubmit);
-
-  const closeModalBtn = document.createElement("button");
-  closeModalBtn.textContent = "Close";
-  closeModalBtn.addEventListener("click", () => (modal.style.display = "none"));
-
-  modalContent.append(taskNameInput, assigneeInput, submitBtn, closeModalBtn);
-  modal.appendChild(modalContent);
-  document.body.appendChild(modal);
-
-  function renderBoard() {
-      board.innerHTML = "";
-      kanbanColumns.forEach(createColumn);
-      board.appendChild(addColumnBtn);
-  }
-
-  function createColumn(name) {
-      const newColumn = document.createElement("div");
-      newColumn.classList.add("column");
-
-      const columnHeader = document.createElement("div");
-      columnHeader.classList.add("column-header");
-
-      const titleSpan = document.createElement("span");
-      titleSpan.textContent = name;
-
-      const createTaskBtn = document.createElement("button");
-      createTaskBtn.classList.add("create-task");
-      createTaskBtn.textContent = "+ Create Task";
-      createTaskBtn.addEventListener("click", () => openModal(newColumn.querySelector(".task-container")));
-
-      const taskContainer = document.createElement("div");
-      taskContainer.classList.add("task-container");
-
-      // Enable drag-and-drop functionality
-      taskContainer.addEventListener("dragover", (e) => e.preventDefault());
-      taskContainer.addEventListener("drop", handleTaskDrop);
-
-      columnHeader.appendChild(titleSpan);
-      newColumn.append(columnHeader, createTaskBtn, taskContainer);
-
-      board.appendChild(newColumn);
-      addMenuToColumn(newColumn);
-      makeColumnsEditable();
-  }
-
-  function addTaskToColumn(taskContainer, taskName, assignee) {
+    function addTaskToColumn(taskContainer, task) {
       const taskItem = document.createElement("div");
       taskItem.classList.add("task-item");
-      taskItem.setAttribute("draggable", true);
-      taskItem.innerHTML = `<span>${taskName} (Assigned to: ${assignee})</span>`;
-
-      taskItem.addEventListener("dragstart", () => taskItem.classList.add("dragging"));
-      taskItem.addEventListener("dragend", () => taskItem.classList.remove("dragging"));
-
+      taskItem.setAttribute('draggable', true);
+      taskItem.dataset.taskId = task.id; // Store task ID for reference
+  
+      // Add the class to mark it as being dragged
+      taskItem.addEventListener('dragstart', function () {
+          taskItem.classList.add('dragging');
+      });
+  
+      taskItem.addEventListener('dragend', function () {
+          taskItem.classList.remove('dragging');
+      });
+  
+      // Create a text display for both task name and assignee
+      const taskText = document.createElement("span");
+      taskText.textContent = `${task.name} (Assigned to: ${task.assignee})`;
+  
+      // Create a delete button for the task
       const deleteBtn = document.createElement("button");
       deleteBtn.classList.add("delete-btn");
       deleteBtn.textContent = "x";
-      deleteBtn.addEventListener("click", () => taskContainer.removeChild(taskItem));
+  
+      deleteBtn.addEventListener("click", function () {
+        console.log("Clicked delete for task:", task.id); // Debugging
+        removeTask(taskItem.dataset.taskId);  // Remove from storage
+        taskContainer.removeChild(taskItem);  // Remove from UI
+      });
 
+      // Append the task text and delete button to the task item
+      taskItem.appendChild(taskText);
       taskItem.appendChild(deleteBtn);
+  
+      // Append the task item to the task container
       taskContainer.appendChild(taskItem);
   }
 
-  function handleTaskDrop(event) {
-      event.preventDefault();
-      const draggedTask = document.querySelector(".dragging");
-      event.currentTarget.appendChild(draggedTask);
-  }
+  function renderTasksForColumn(taskContainer, columnName) {
+    taskContainer.innerHTML = ""; // Clear existing tasks
 
-  function openModal(taskContainer) {
-      modal.style.display = "block";
-      taskNameInput.value = "";
-      assigneeInput.value = "";
-      submitBtn.onclick = () => handleTaskSubmit(taskContainer);
-  }
+    getAllTasks()
+        .filter(task => task.status.toUpperCase() === columnName.toUpperCase()) // Match tasks with column
+        .forEach(task => addTaskToColumn(taskContainer, task));
+    }
 
-  function handleTaskSubmit(taskContainer) {
-      const taskName = taskNameInput.value.trim();
-      const assignee = assigneeInput.value.trim() || "Unassigned";
-      if (taskName) {
-          addTaskToColumn(taskContainer, taskName, assignee);
-          modal.style.display = "none";
-      }
-  }
+    function createModal() {
+        const modal = document.createElement("div");
+        modal.classList.add("modal");
 
-  function addMenuToColumn(column) {
-      const columnHeader = column.querySelector(".column-header");
+        const modalContent = document.createElement("div");
+        modalContent.classList.add("modal-content");
 
-      if (columnHeader.querySelector(".menu-btn")) return;
+        const taskNameInput = document.createElement("input");
+        taskNameInput.placeholder = "Task Name";
+        taskNameInput.id = "taskNameInput";
 
-      const menuBtn = document.createElement("button");
-      menuBtn.classList.add("menu-btn");
-      menuBtn.innerHTML = "⋮";
+        const assigneeInput = document.createElement("input");
+        assigneeInput.placeholder = "Assignee Name";
+        assigneeInput.id = "assigneeInput";
 
-      const menuDropdown = document.createElement("div");
-      menuDropdown.classList.add("menu-dropdown");
-      menuDropdown.style.display = "none";
+        const submitBtn = document.createElement("button");
+        submitBtn.textContent = "Create Task";
+        submitBtn.id = "submitTaskBtn";
 
-      const renameOption = document.createElement("div");
-      renameOption.classList.add("menu-option");
-      renameOption.textContent = "Rename";
-      renameOption.addEventListener("click", () => editColumnName(columnHeader.querySelector("span")));
+        const closeModalBtn = document.createElement("button");
+        closeModalBtn.textContent = "Close";
+        closeModalBtn.id = "closeModalBtn";
 
-      const deleteOption = document.createElement("div");
-      deleteOption.classList.add("menu-option");
-      deleteOption.textContent = "Delete";
-      deleteOption.addEventListener("click", () => deleteColumn(column));
+        modalContent.append(taskNameInput, assigneeInput, submitBtn, closeModalBtn);
+        modal.appendChild(modalContent);
+        document.body.appendChild(modal);
 
-      menuDropdown.append(renameOption, deleteOption);
-      columnHeader.append(menuBtn, menuDropdown);
+        modal.style.display = "none";
+        return modal;
+    }
 
-      menuBtn.addEventListener("click", (e) => {
-          e.stopPropagation();
-          closeAllMenus();
-          menuDropdown.style.display = "block";
-      });
+    const modal = createModal();
+    const submitBtn = document.getElementById("submitTaskBtn");
+    const closeModalBtn = document.getElementById("closeModalBtn");
 
-      document.addEventListener("click", () => (menuDropdown.style.display = "none"));
-  }
+    function renderBoard() {
+        board.innerHTML = "";
+        kanbanColumns.forEach(createColumn);
+        board.appendChild(addColumnBtn);
+    }
 
-  function makeColumnsEditable() {
-      document.querySelectorAll(".column-header span").forEach((title) => {
-          title.removeEventListener("click", handleTitleClick);
-          title.addEventListener("click", handleTitleClick);
-      });
-  }
+    function createColumn(name) {
+        const newColumn = document.createElement("div");
+        newColumn.classList.add("column");
 
-  function handleTitleClick(event) {
-      editColumnName(event.target);
-  }
+        const columnHeader = document.createElement("div");
+        columnHeader.classList.add("column-header");
 
-  function editColumnName(title) {
-      if (title.querySelector("input")) return;
+        const titleSpan = document.createElement("span");
+        titleSpan.textContent = name;
 
-      const currentText = title.textContent.trim();
-      const input = document.createElement("input");
-      input.type = "text";
-      input.value = currentText;
-      input.classList.add("edit-column-input");
+        const createTaskBtn = document.createElement("button");
+        createTaskBtn.classList.add("create-task");
+        createTaskBtn.textContent = "+ Create Task";
 
-      title.innerHTML = "";
-      title.appendChild(input);
-      input.focus();
+        const taskContainer = document.createElement("div");
+        taskContainer.classList.add("task-container");
 
-      input.addEventListener("blur", () => saveColumnName(title, input));
-      input.addEventListener("keypress", (e) => e.key === "Enter" && saveColumnName(title, input));
-  }
+        taskContainer.addEventListener("dragover", function (e) {
+            e.preventDefault();
+        });
 
-  function saveColumnName(header, input) {
-      const newText = input.value.trim() || "Untitled Column";
-      const index = kanbanColumns.indexOf(header.textContent);
-      if (index !== -1) {
-          kanbanColumns[index] = newText;
-      }
-      header.textContent = newText;
-  }
+        taskContainer.addEventListener("drop", function (e) {
+            e.preventDefault();
+            const draggedTask = document.querySelector(".dragging");
+            taskContainer.appendChild(draggedTask);
+        });
 
-  function deleteColumn(column) {
-      const index = kanbanColumns.indexOf(column.querySelector(".column-header span").textContent);
-      if (index !== -1) {
-          kanbanColumns.splice(index, 1);
-          renderBoard();
-      }
-  }
+        columnHeader.appendChild(titleSpan);
+        newColumn.appendChild(columnHeader);
+        newColumn.appendChild(createTaskBtn);
+        newColumn.appendChild(taskContainer);
 
-  function closeAllMenus() {
-      document.querySelectorAll(".menu-dropdown").forEach((menu) => (menu.style.display = "none"));
-  }
+        board.appendChild(newColumn);
 
-  addColumnBtn.addEventListener("click", function () {
-      const columnName = prompt("Enter column name:").trim();
-      if (columnName) {
-          kanbanColumns.push(columnName);
-          renderBoard();
-      }
-  });
+        addMenuToColumn(newColumn);
+        makeColumnsEditable();
 
-  renderBoard();
+        renderTasksForColumn(taskContainer, name);
+
+        createTaskBtn.addEventListener("click", function () {
+            openModal(taskContainer, name);
+        });
+    }
+
+    function openModal(taskContainer, columnStatus) {
+        modal.style.display = "block";
+        taskNameInput.value = "";
+        assigneeInput.value = "";
+
+        submitBtn.onclick = function () {
+            const taskName = taskNameInput.value.trim();
+            const assignee = assigneeInput.value.trim() || "Unassigned";
+
+            if (taskName) {
+                addTask(taskName, assignee, columnStatus);
+                modal.style.display = "none";
+            }
+        };
+    }
+
+    function addTask(taskName, assignee, status) {
+      const newTask = {
+          id: Date.now(),
+          name: taskName,
+          assigned: assignee,
+          status: status
+      };
+  
+      backlogTasks.push(newTask);
+  
+      // ✅ Save backlogTasks to localStorage
+      localStorage.setItem("backlogTasks", JSON.stringify(backlogTasks));
+  
+      renderBoard(); // Re-render UI
+    }
+  
+
+    closeModalBtn.addEventListener("click", function () {
+        modal.style.display = "none";
+    });
+
+    function saveColumns() {
+        localStorage.setItem("kanbanColumns", JSON.stringify(kanbanColumns));
+    }
+
+    function addMenuToColumn(column) {
+        const columnHeader = column.querySelector(".column-header");
+
+        if (columnHeader.querySelector(".menu-btn")) return;
+
+        const menuBtn = document.createElement("button");
+        menuBtn.classList.add("menu-btn");
+        menuBtn.innerHTML = "⋮";
+
+        const menuDropdown = document.createElement("div");
+        menuDropdown.classList.add("menu-dropdown");
+        menuDropdown.style.display = "none";
+
+        const renameOption = document.createElement("div");
+        renameOption.classList.add("menu-option");
+        renameOption.textContent = "Rename";
+        renameOption.addEventListener("click", () => editColumnName(columnHeader.querySelector("span")));
+
+        const deleteOption = document.createElement("div");
+        deleteOption.classList.add("menu-option");
+        deleteOption.textContent = "Delete";
+        deleteOption.addEventListener("click", () => deleteColumn(column));
+
+        menuDropdown.append(renameOption, deleteOption);
+        columnHeader.append(menuBtn, menuDropdown);
+
+        menuBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            closeAllMenus();
+            menuDropdown.style.display = "block";
+        });
+
+        document.addEventListener("click", () => (menuDropdown.style.display = "none"));
+    }
+
+    function makeColumnsEditable() {
+        document.querySelectorAll(".column-header span").forEach((title) => {
+            title.removeEventListener("click", handleTitleClick);
+            title.addEventListener("click", handleTitleClick);
+        });
+    }
+
+    function handleTitleClick(event) {
+        editColumnName(event.target);
+    }
+
+    function editColumnName(title) {
+        if (title.querySelector("input")) return;
+
+        const currentText = title.textContent.trim();
+        const input = document.createElement("input");
+        input.type = "text";
+        input.value = currentText;
+        input.classList.add("edit-column-input");
+
+        title.innerHTML = "";
+        title.appendChild(input);
+        input.focus();
+
+        input.addEventListener("blur", () => saveColumnName(title, input));
+        input.addEventListener("keypress", (e) => e.key === "Enter" && saveColumnName(title, input));
+    }
+
+    function saveColumnName(header, input) {
+        const newText = input.value.trim() || "Untitled Column";
+        const index = kanbanColumns.indexOf(header.textContent);
+        if (index !== -1) {
+            kanbanColumns[index] = newText;
+            saveColumns();
+        }
+        header.textContent = newText;
+    }
+
+    function deleteColumn(column) {
+        const columnName = column.querySelector(".column-header span").textContent;
+        const index = kanbanColumns.indexOf(columnName);
+        if (index !== -1) {
+            kanbanColumns.splice(index, 1);
+            saveColumns();
+            renderBoard();
+        }
+    }
+
+    function closeAllMenus() {
+        document.querySelectorAll(".menu-dropdown").forEach((menu) => (menu.style.display = "none"));
+    }
+
+    addColumnBtn.addEventListener("click", function () {
+        const columnName = prompt("Enter column name:").trim();
+        if (columnName) {
+            kanbanColumns.push(columnName);
+            saveColumns();
+            renderBoard();
+        }
+    });
+
+    renderBoard();
 }
